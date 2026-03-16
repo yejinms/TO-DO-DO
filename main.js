@@ -1,8 +1,9 @@
-const { app, BrowserWindow, ipcMain, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, screen, Tray, Menu, nativeImage } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
 let mainWindow;
+let tray;
 
 function getDataPath() {
   return path.join(app.getPath('userData'), 'todos.json');
@@ -61,8 +62,56 @@ function createWindow() {
     app.dock.hide();
   }
 
+  createTray();
+
   // Uncomment to open DevTools during development
   // mainWindow.webContents.openDevTools();
+}
+
+function createTray() {
+  // 16×16 오렌지 원 아이콘을 코드로 생성 (별도 이미지 파일 불필요)
+  const icon = nativeImage.createFromDataURL(
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/' +
+    '9hAAAAZklEQVQ4T2NkYGD4z8BAAiYlJf+JNYBkA0g2gBQDSDaAFAMoZgApBlDM' +
+    'AFIMoJgBpBhAMQNIMYBiBpBiAMUMIMUAihlAigEUM4AUAyhmACkGUMwAUgygmAGk' +
+    'GEAxA0gxgGIGAABZoAAR/6sRIgAAAABJRU5ErkJggg=='
+  );
+
+  // 메뉴바에 텍스트로 표시 (이미지보다 명확)
+  tray = new Tray(nativeImage.createEmpty());
+  tray.setTitle('✦ TODO');
+  tray.setToolTip('TO-DO-DO');
+
+  const menu = Menu.buildFromTemplate([
+    {
+      label: '위젯 보이기 / 숨기기',
+      click: () => {
+        if (mainWindow.isVisible()) {
+          mainWindow.hide();
+        } else {
+          mainWindow.show();
+          mainWindow.focus();
+        }
+      },
+    },
+    { type: 'separator' },
+    {
+      label: '종료',
+      click: () => app.quit(),
+    },
+  ]);
+
+  tray.setContextMenu(menu);
+
+  // 메뉴바 아이콘 클릭 시 토글
+  tray.on('click', () => {
+    if (mainWindow.isVisible()) {
+      mainWindow.hide();
+    } else {
+      mainWindow.show();
+      mainWindow.focus();
+    }
+  });
 }
 
 // IPC handlers
@@ -91,11 +140,12 @@ ipcMain.handle('delete-date', (event, date) => {
 });
 
 ipcMain.on('close-window', () => {
-  app.quit();
+  // 완전 종료 대신 숨기기 (메뉴바에서 다시 열 수 있음)
+  mainWindow.hide();
 });
 
 ipcMain.on('minimize-window', () => {
-  mainWindow.minimize();
+  mainWindow.hide();
 });
 
 app.whenReady().then(createWindow);
