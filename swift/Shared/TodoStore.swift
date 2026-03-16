@@ -1,8 +1,7 @@
 import Foundation
 
-// ⚠️ App Group ID는 Xcode → Signing & Capabilities → App Groups 에서 등록 후 일치시켜야 함
-let kAppGroupID  = "group.com.yejinms.tododo"
-let kStorageKey  = "todos_v1"
+let kAppGroupID = "group.com.yejinms.tododo"
+let kStorageKey = "todos_v1"
 
 class TodoStore: ObservableObject {
     static let shared = TodoStore()
