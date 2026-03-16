@@ -2,20 +2,39 @@
    TO-DO-DO — Risograph Widget
    ============================ */
 
+/* --- Custom fonts --- */
+@font-face {
+  font-family: 'EF_jejudoldam';
+  src: url('fonts/EF_jejudoldam.woff2') format('woff2'),
+       url('fonts/EF_jejudoldam.woff') format('woff'),
+       url('fonts/EF_jejudoldam.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'LeeSeoyun';
+  src: url('fonts/LeeSeoyun.woff2') format('woff2'),
+       url('fonts/LeeSeoyun.woff') format('woff'),
+       url('fonts/LeeSeoyun.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 /* --- Palette --- */
 :root {
-  --pink-bg:     #F2C9C5;
-  --pink-light:  #F7DEDA;
-  --pink-dark:   #E8B5B0;
-  --orange:      #D94020;
-  --orange-dark: #BC3518;
-  --orange-faint: rgba(217, 64, 32, 0.12);
-  --orange-mid:  rgba(217, 64, 32, 0.35);
-  --white:       #FFF8F6;
+  --pink-bg:      #F6CFDA;
+  --pink-light:   #FAE0E9;
+  --pink-dark:    #EDB8C8;
+  --orange:       #F0674B;
+  --orange-dark:  #D44F35;
+  --orange-faint: rgba(240, 103, 75, 0.12);
+  --orange-mid:   rgba(240, 103, 75, 0.35);
+  --white:        #FFF5F8;
 
-  --font-title:  'Black Han Sans', 'Nanum Gothic', sans-serif;
-  --font-body:   'Gaegu', 'Nanum Pen Script', cursive;
-  --font-label:  'Black Han Sans', sans-serif;
+  --font-title:  'EF_jejudoldam', 'Black Han Sans', sans-serif;
+  --font-body:   'LeeSeoyun', 'Gaegu', cursive;
+  --font-label:  'EF_jejudoldam', 'Black Han Sans', sans-serif;
 
   --radius:      6px;
   --border:      2.5px solid var(--orange);
