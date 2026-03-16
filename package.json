@@ -1,0 +1,33 @@
+{
+  "name": "to-do-do",
+  "version": "1.0.0",
+  "description": "A risograph-style desktop todo widget for MacBook",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --mac"
+  },
+  "keywords": ["todo", "widget", "electron", "macos"],
+  "author": "yejinms",
+  "license": "MIT",
+  "dependencies": {
+    "electron": "^28.0.0"
+  },
+  "devDependencies": {
+    "electron-builder": "^24.0.0"
+  },
+  "build": {
+    "appId": "com.yejinms.to-do-do",
+    "productName": "TO-DO-DO",
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": ["dmg", "zip"]
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}

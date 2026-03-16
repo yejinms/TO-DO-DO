@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TO-DO-DO</title>
+
+  <!-- Risograph-style Korean fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gaegu:wght@400;700&family=Nanum+Pen+Script&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- SVG filters for risograph effect -->
+  <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="roughen" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="2" seed="2" result="noise"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.2"
+          xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <filter id="roughen-heavy" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="turbulence" baseFrequency="0.03" numOctaves="3" seed="5" result="noise"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2"
+          xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <filter id="grain">
+        <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="4" stitchTiles="stitch" result="noiseOut"/>
+        <feColorMatrix type="saturate" values="0" in="noiseOut" result="grayNoise"/>
+        <feBlend in="SourceGraphic" in2="grayNoise" mode="multiply" result="blend"/>
+        <feComposite in="blend" in2="SourceGraphic" operator="in"/>
+      </filter>
+    </defs>
+  </svg>
+
+  <div class="widget" id="widget">
+    <!-- Drag handle / title bar -->
+    <div class="title-bar" id="drag-region">
+      <div class="window-controls">
+        <button class="ctrl-btn close-btn" id="close-btn" title="닫기">×</button>
+        <button class="ctrl-btn min-btn" id="min-btn" title="최소화">−</button>
+      </div>
+    </div>
+
+    <!-- App header -->
+    <div class="app-header">
+      <div class="header-lines top-lines">
+        <span></span><span></span><span></span>
+      </div>
+      <h1 class="app-title">TO-DO-DO</h1>
+      <div class="header-lines bottom-lines">
+        <span></span><span></span>
+      </div>
+    </div>
+
+    <!-- Date navigation -->
+    <div class="date-nav">
+      <button class="nav-btn" id="prev-btn" title="이전 날">&#8249;</button>
+      <div class="date-display-wrap">
+        <span class="date-display" id="date-display">MON / JAN 15</span>
+        <span class="date-today-badge" id="today-badge">TODAY</span>
+      </div>
+      <button class="nav-btn" id="next-btn" title="다음 날">&#8250;</button>
+    </div>
+
+    <!-- Divider -->
+    <div class="section-divider"></div>
+
+    <!-- Todo list -->
+    <div class="todo-section">
+      <div class="section-label">
+        <span>TASKS</span>
+        <span class="task-count" id="task-count">0 / 0</span>
+      </div>
+      <ul class="todo-list" id="todo-list">
+        <!-- Items rendered by app.js -->
+      </ul>
+      <div class="empty-state" id="empty-state">
+        <span>아직 할 일이 없어요</span>
+        <span class="empty-sub">아래에 추가해보세요 ↓</span>
+      </div>
+    </div>
+
+    <!-- Add new todo -->
+    <div class="add-todo-area" id="add-area">
+      <div class="section-divider"></div>
+      <div class="add-todo-row">
+        <input
+          type="text"
+          id="new-todo-input"
+          class="new-todo-input"
+          placeholder="새로운 할 일 추가..."
+          maxlength="60"
+        />
+        <button class="add-btn" id="add-btn">+</button>
+      </div>
+    </div>
+
+    <!-- Paper texture overlay -->
+    <div class="paper-grain" aria-hidden="true"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

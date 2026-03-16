@@ -1,0 +1,512 @@
+/* ============================
+   TO-DO-DO — Risograph Widget
+   ============================ */
+
+/* --- Palette --- */
+:root {
+  --pink-bg:     #F2C9C5;
+  --pink-light:  #F7DEDA;
+  --pink-dark:   #E8B5B0;
+  --orange:      #D94020;
+  --orange-dark: #BC3518;
+  --orange-faint: rgba(217, 64, 32, 0.12);
+  --orange-mid:  rgba(217, 64, 32, 0.35);
+  --white:       #FFF8F6;
+
+  --font-title:  'Black Han Sans', 'Nanum Gothic', sans-serif;
+  --font-body:   'Gaegu', 'Nanum Pen Script', cursive;
+  --font-label:  'Black Han Sans', sans-serif;
+
+  --radius:      6px;
+  --border:      2.5px solid var(--orange);
+}
+
+/* --- Reset --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+button { cursor: pointer; border: none; background: none; }
+input { outline: none; }
+ul { list-style: none; }
+
+/* --- Body / Window --- */
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+}
+
+body {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- Widget container --- */
+.widget {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-color: var(--pink-bg);
+  border: var(--border);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  /* Slight paper shadow */
+  box-shadow:
+    3px 3px 0 var(--orange-dark),
+    6px 6px 0 rgba(188, 53, 24, 0.25),
+    0 12px 40px rgba(0,0,0,0.25);
+
+  /* Risograph rough edge */
+  filter: url(#roughen);
+}
+
+/* --- Paper grain overlay --- */
+.paper-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  mix-blend-mode: multiply;
+}
+
+/* --- Title bar (drag region) --- */
+.title-bar {
+  -webkit-app-region: drag;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  background: var(--pink-bg);
+  border-bottom: 1.5px solid var(--orange-mid);
+  flex-shrink: 0;
+}
+
+.window-controls {
+  -webkit-app-region: no-drag;
+  display: flex;
+  gap: 6px;
+}
+
+.ctrl-btn {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--orange);
+  color: var(--orange);
+  font-size: 11px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  font-family: var(--font-title);
+}
+.ctrl-btn:hover { background: var(--orange); color: var(--pink-bg); }
+.close-btn:hover { background: var(--orange-dark); border-color: var(--orange-dark); }
+
+/* --- App header --- */
+.app-header {
+  padding: 14px 20px 8px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.header-lines {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  justify-content: center;
+  margin: 4px 0;
+}
+.header-lines span {
+  display: block;
+  height: 2px;
+  background: var(--orange);
+  border-radius: 1px;
+}
+.top-lines span:nth-child(1) { width: 55px; }
+.top-lines span:nth-child(2) { width: 30px; }
+.top-lines span:nth-child(3) { width: 55px; }
+.bottom-lines span:nth-child(1) { width: 130px; }
+.bottom-lines span:nth-child(2) { width: 20px; }
+
+.app-title {
+  font-family: var(--font-title);
+  font-size: 38px;
+  color: var(--orange);
+  letter-spacing: 4px;
+  line-height: 1;
+  text-transform: uppercase;
+
+  /* Risograph ink bleed text shadow */
+  text-shadow:
+    1.5px 1.5px 0 rgba(217, 64, 32, 0.25),
+    -0.5px 0.5px 0 rgba(217, 64, 32, 0.15),
+    0 0 18px rgba(217, 64, 32, 0.08);
+
+  filter: url(#roughen);
+}
+
+/* --- Date navigation --- */
+.date-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 16px 10px;
+  flex-shrink: 0;
+}
+
+.date-display-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.date-display {
+  font-family: var(--font-label);
+  font-size: 15px;
+  color: var(--orange);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+}
+
+.date-today-badge {
+  font-family: var(--font-label);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--pink-bg);
+  background: var(--orange);
+  padding: 1px 7px;
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.date-today-badge.visible { opacity: 1; }
+
+.nav-btn {
+  font-family: var(--font-title);
+  font-size: 28px;
+  color: var(--orange);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  transition: background 0.15s, color 0.15s, transform 0.1s;
+  line-height: 1;
+}
+.nav-btn:hover  { background: var(--orange); color: var(--pink-bg); }
+.nav-btn:active { transform: scale(0.93); }
+.nav-btn:disabled { opacity: 0.3; pointer-events: none; }
+
+/* --- Section divider --- */
+.section-divider {
+  margin: 0 16px;
+  height: 2.5px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--orange) 0px,
+    var(--orange) 8px,
+    transparent 8px,
+    transparent 12px
+  );
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+/* --- Todo section --- */
+.todo-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 10px 0 4px;
+}
+
+.section-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0 20px 6px;
+  font-family: var(--font-label);
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  color: var(--orange);
+  opacity: 0.75;
+}
+
+.task-count {
+  font-family: var(--font-body);
+  font-size: 12px;
+  letter-spacing: 0;
+  opacity: 0.8;
+}
+
+/* --- Todo list --- */
+.todo-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 14px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--orange-mid) transparent;
+}
+.todo-list::-webkit-scrollbar { width: 4px; }
+.todo-list::-webkit-scrollbar-thumb {
+  background: var(--orange-mid);
+  border-radius: 2px;
+}
+
+/* --- Todo item --- */
+.todo-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--pink-light);
+  border: 2px solid var(--orange);
+  border-radius: 3px;
+  position: relative;
+  transition: opacity 0.2s, background 0.15s;
+
+  /* Ink offset for risograph feel */
+  box-shadow: 1.5px 1.5px 0 rgba(217, 64, 32, 0.22);
+}
+
+.todo-item.done {
+  background: var(--pink-bg);
+  opacity: 0.58;
+  border-style: dashed;
+}
+
+.todo-item.priority {
+  background: var(--white);
+  border-color: var(--orange-dark);
+  border-width: 2.5px;
+}
+
+/* Slight misregistration on priority items */
+.todo-item.priority::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border: 1.5px solid rgba(217, 64, 32, 0.2);
+  border-radius: 3px;
+  transform: translate(1.5px, 1px);
+  pointer-events: none;
+}
+
+/* --- Checkbox --- */
+.todo-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid var(--orange);
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+  margin-top: 2px;
+  border-radius: 2px;
+  transform: rotate(-0.8deg);
+  transition: background 0.15s;
+}
+
+.todo-checkbox:checked {
+  background: var(--orange);
+}
+
+.todo-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 0px;
+  width: 7px;
+  height: 12px;
+  border: 2.5px solid var(--pink-bg);
+  border-top: none;
+  border-left: none;
+  transform: rotate(42deg);
+}
+
+/* --- Todo text --- */
+.todo-text {
+  flex: 1;
+  font-family: var(--font-body);
+  font-size: 17px;
+  color: var(--orange);
+  line-height: 1.35;
+  word-break: break-all;
+  cursor: pointer;
+  min-height: 22px;
+}
+
+.todo-item.done .todo-text {
+  text-decoration: line-through;
+  text-decoration-color: var(--orange);
+  text-decoration-thickness: 2px;
+}
+
+/* Inline edit */
+.todo-text[contenteditable="true"] {
+  border-bottom: 1.5px dashed var(--orange-mid);
+  outline: none;
+  background: transparent;
+}
+
+/* --- Priority star button --- */
+.star-btn {
+  flex-shrink: 0;
+  font-size: 18px;
+  color: var(--orange);
+  opacity: 0.3;
+  transition: opacity 0.15s, transform 0.15s;
+  line-height: 1;
+  padding: 2px;
+  margin-top: 0px;
+}
+.star-btn:hover   { opacity: 0.75; transform: scale(1.2); }
+.star-btn.active  { opacity: 1; }
+
+/* Star sticker effect when active */
+.star-btn.active::before {
+  content: '★';
+  position: absolute;
+  color: rgba(217, 64, 32, 0.18);
+  font-size: 22px;
+  transform: translate(-1px, 1px);
+}
+.star-btn .star-icon { position: relative; }
+
+/* --- Delete button --- */
+.delete-btn {
+  flex-shrink: 0;
+  font-size: 14px;
+  color: var(--orange);
+  opacity: 0;
+  transition: opacity 0.15s;
+  padding: 2px 4px;
+  margin-top: 1px;
+}
+.todo-item:hover .delete-btn { opacity: 0.4; }
+.delete-btn:hover { opacity: 1 !important; }
+
+/* --- Empty state --- */
+.empty-state {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 30px 20px;
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--orange);
+  opacity: 0.45;
+  text-align: center;
+}
+.empty-state.visible { display: flex; }
+.empty-sub { font-size: 13px; opacity: 0.8; }
+
+/* --- Add todo area --- */
+.add-todo-area {
+  flex-shrink: 0;
+  padding: 0 0 14px;
+}
+
+.add-todo-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px 0;
+}
+
+.new-todo-input {
+  flex: 1;
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--orange);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--orange);
+  padding: 4px 2px 4px;
+  caret-color: var(--orange);
+}
+.new-todo-input::placeholder {
+  color: var(--orange);
+  opacity: 0.38;
+  font-style: italic;
+}
+.new-todo-input:focus {
+  border-bottom-color: var(--orange-dark);
+}
+
+.add-btn {
+  width: 36px;
+  height: 36px;
+  border: var(--border);
+  border-radius: var(--radius);
+  color: var(--orange);
+  font-size: 24px;
+  font-family: var(--font-title);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  transition: background 0.15s, color 0.15s, transform 0.1s;
+  line-height: 1;
+}
+.add-btn:hover  { background: var(--orange); color: var(--pink-bg); }
+.add-btn:active { transform: scale(0.93); }
+
+/* --- Reading past date mode --- */
+.widget.past-mode .add-todo-area {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.widget.past-mode .add-todo-area::after {
+  content: '과거 날짜는 수정할 수 없어요';
+  display: block;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--orange);
+  opacity: 0.6;
+  padding-top: 4px;
+}
+
+/* --- Subtle animation --- */
+@keyframes stamp-in {
+  0%   { transform: scale(1.06) rotate(-0.5deg); opacity: 0.7; }
+  60%  { transform: scale(0.98) rotate(0.3deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.todo-item {
+  animation: stamp-in 0.18s ease-out both;
+}
+
+/* --- Scrollbar for past date indicator --- */
+.past-indicator {
+  position: absolute;
+  top: 34px;
+  right: 10px;
+  font-family: var(--font-label);
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--orange);
+  opacity: 0.5;
+  text-transform: uppercase;
+}
