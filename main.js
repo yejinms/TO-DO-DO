@@ -39,9 +39,9 @@ function createWindow() {
     resizable: true,
     hasShadow: true,
     // Widget behavior
-    alwaysOnTop: true,
-    skipTaskbar: true,          // Dock/Taskbar에 표시 안 함
-    focusable: true,
+    alwaysOnTop: false,
+    skipTaskbar: true,
+    focusable: true,            // 투두 입력을 위해 포커스는 유지
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -54,8 +54,11 @@ function createWindow() {
   // macOS 전용: 모든 스페이스(가상 데스크탑)에 표시
   mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: false });
 
-  // 다른 앱 위에 뜨되, 일반 창보다는 낮은 레벨 (진짜 위젯 느낌)
-  mainWindow.setAlwaysOnTop(true, 'floating');
+  // 배경 고정: 모든 창 뒤에 깔림 (배경화면 바로 위)
+  mainWindow.setAlwaysOnTop(false);
+  if (process.platform === 'darwin') {
+    mainWindow.setWindowButtonVisibility(false);
+  }
 
   // macOS Dock에서 숨기기
   if (process.platform === 'darwin' && app.dock) {
