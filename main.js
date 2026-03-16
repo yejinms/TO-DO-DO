@@ -36,9 +36,11 @@ function createWindow() {
     frame: false,
     transparent: true,
     resizable: true,
-    alwaysOnTop: false,
-    skipTaskbar: false,
     hasShadow: true,
+    // Widget behavior
+    alwaysOnTop: true,
+    skipTaskbar: true,          // Dock/Taskbar에 표시 안 함
+    focusable: true,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -47,6 +49,17 @@ function createWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'));
+
+  // macOS 전용: 모든 스페이스(가상 데스크탑)에 표시
+  mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: false });
+
+  // 다른 앱 위에 뜨되, 일반 창보다는 낮은 레벨 (진짜 위젯 느낌)
+  mainWindow.setAlwaysOnTop(true, 'floating');
+
+  // macOS Dock에서 숨기기
+  if (process.platform === 'darwin' && app.dock) {
+    app.dock.hide();
+  }
 
   // Uncomment to open DevTools during development
   // mainWindow.webContents.openDevTools();
